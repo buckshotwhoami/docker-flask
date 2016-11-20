@@ -1,0 +1,31 @@
+version: '2'
+
+services:
+  mysql:
+    restart: always
+    build:
+      context: ./mysql
+      dockerfile: DockerFile
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=changeThisSecretPasswordHere
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    ports:
+      - 127.0.0.1:3306:3306
+
+  flask-wsgi:
+    restart: always
+    build:
+      context: ./nginx
+      dockerfile: DockerFile
+    image: nginx-flask
+    depends_on:
+      - mysql
+    links:
+      - mysql
+    volumes:
+      - ./src:/appdata/www/src
+    ports:
+      - 127.0.0.1:80:80
+      - 127.0.0.1:443:443
